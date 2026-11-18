@@ -1,0 +1,38 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: evo_gaming
+      POSTGRES_USER: evo
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change-me}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U evo -d evo_gaming"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build:
+      context: .
+      args:
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://evo:${POSTGRES_PASSWORD:-change-me}@db:5432/evo_gaming
+      AUTH_SECRET: ${AUTH_SECRET:?Isi AUTH_SECRET di file .env}
+      MOCK_GATEWAY_SECRET: ${MOCK_GATEWAY_SECRET:?Isi MOCK_GATEWAY_SECRET di file .env}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-owner@evogaming.local}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?Isi ADMIN_PASSWORD di file .env}
+      PAYMENT_MODE: mock
+      NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:

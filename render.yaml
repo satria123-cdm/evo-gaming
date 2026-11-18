@@ -1,0 +1,33 @@
+# Render Blueprint — EVO Gaming (demo, QRIS simulasi)
+# Database memakai Neon Postgres GRATIS di luar Render.
+# Render Postgres gratis hanya bertahan 90 hari, jadi tidak dipakai di sini.
+
+services:
+  - type: web
+    name: evo-gaming
+    runtime: node
+    plan: free
+    region: singapore
+    buildCommand: npm ci && npm run build && npm run db:migrate
+    startCommand: npm start
+    # Jalan sekali setelah deploy pertama: isi unit, meja, admin, harga, produk.
+    initialDeployHook: npm run db:seed
+    # Domain sendiri (opsional): tambahkan `domains: [evo-gaming.id]` di sini,
+    # lalu isi NEXT_PUBLIC_SITE_URL dengan https://evo-gaming.id dan arahkan DNS.
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: DATABASE_URL
+        sync: false # tempel connection string Neon (yang NON-pooled, + ?sslmode=require)
+      - key: AUTH_SECRET
+        generateValue: true
+      - key: MOCK_GATEWAY_SECRET
+        sync: false # isi secret buatanmu; dipakai juga smoke test untuk tanda tangan webhook
+      - key: ADMIN_EMAIL
+        value: owner@evogaming.local
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: PAYMENT_MODE
+        value: mock
+      - key: NEXT_PUBLIC_SITE_URL
+        sync: false # URL asli dari dashboard Render, mis. https://evo-gaming.onrender.com

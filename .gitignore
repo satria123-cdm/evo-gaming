@@ -1,0 +1,14 @@
+node_modules/
+.next/
+out/
+build/
+*.tsbuildinfo
+
+# Jangan pernah commit secret / koneksi DB lokal.
+.env*
+!.env.example
+
+npm-debug.log*
+yarn-error.log*
+.DS_Store
+Thumbs.db

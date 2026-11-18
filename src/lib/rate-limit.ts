@@ -1,0 +1,45 @@
+/**
+ * Minimal in-memory rate limiter.
+ * Scope is a single Node process — fine for one dev/small deployment,
+ * replace with Redis/Upstash before scaling horizontally.
+ */
+type Bucket = { count: number; resetAt: number };
+
+const buckets = new Map<string, Bucket>();
+
+export function rateLimit(
+  key: string,
+  { limit, windowMs }: { limit: number; windowMs: number },
+): { ok: true } | { ok: false; retryAfterSeconds: number } {
+  const now = Date.now();
+  const bucket = buckets.get(key);
+
+  if (!bucket || bucket.resetAt <= now) {
+    buckets.set(key, { count: 1, resetAt: now + windowMs });
+    return { ok: true };
+  }
+
+  if (bucket.count >= limit) {
+    return {
+      ok: false,
+      retryAfterSeconds: Math.max(1, Math.ceil((bucket.resetAt - now) / 1000)),
+    };
+  }
+
+  bucket.count += 1;
+  return { ok: true };
+}
+
+export function clientKey(request: Request, scope: string): string {
+  const forwarded = request.headers.get("x-forwarded-for");
+  const ip = forwarded?.split(",")[0]?.trim() || request.headers.get("x-real-ip") || "local";
+  return `${scope}:${ip}`;
+}
+
+/** Occasionally drop expired buckets so the map cannot grow unbounded. */
+export function pruneRateLimiter(): void {
+  const now = Date.now();
+  for (const [key, bucket] of buckets) {
+    if (bucket.resetAt <= now) buckets.delete(key);
+  }
+}
