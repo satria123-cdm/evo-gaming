@@ -24,8 +24,10 @@ dan Next.js langsung dikenali.
    Build command ini dipakai **hanya untuk deploy pertama**. Setelah live, ubah
    menjadi `npm run build && npm run db:migrate` lalu redeploy supaya seed tidak
    menimpa password admin tiap build.
-4. Environment Variables:
-   `DATABASE_URL` (string Neon non-pooled), `AUTH_SECRET`,
+4. Environment Variables. **Nilai `DATABASE_URL` harus diawali persis
+   `postgresql://`** — jangan sertakan `DATABASE_URL=`, tanda kutip, atau spasi;
+   kalau tidak, `pg` akan mengira host-nya `base` dan migrate gagal dengan
+   `getaddrinfo ENOTFOUND base`. Isi juga `AUTH_SECRET`,
    `MOCK_GATEWAY_SECRET`, `ADMIN_EMAIL=owner@evogaming.local`,
    `ADMIN_PASSWORD`, `PAYMENT_MODE=mock`,
    `NEXT_PUBLIC_SITE_URL=https://evo-gaming.vercel.app`, `NODE_VERSION=22`.
