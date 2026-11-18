@@ -8,7 +8,36 @@ Project ini memang ditujukan sebagai demo/simulasi web booking PS4, jadi
 > menyediakan PHP + MySQL, sedangkan project ini butuh Node.js, PostgreSQL,
 > dan proses server yang jalan terus. Pakai salah satu alternatif di bawah.
 
-## Opsi gratis: Render + Neon
+## Opsi gratis TANPA kartu: Vercel + Neon
+
+Render sekarang meminta kartu untuk verifikasi identitas meski plan Free. Kalau
+tidak punya kartu, pakai Vercel saja — Hobby plan-nya gratis, tidak butuh kartu,
+dan Next.js langsung dikenali.
+
+1. Daftar <https://vercel.com> dengan **Continue with GitHub**, lalu
+   **Add New... → Project** → import repo `evo-gaming`.
+2. Project Name: `evo-gaming`, Framework Preset: **Next.js** (auto).
+3. **Build & Development Settings → Build Command** (override):
+   ```
+   npm run build && npm run db:migrate && npm run db:seed
+   ```
+   Build command ini dipakai **hanya untuk deploy pertama**. Setelah live, ubah
+   menjadi `npm run build && npm run db:migrate` lalu redeploy supaya seed tidak
+   menimpa password admin tiap build.
+4. Environment Variables:
+   `DATABASE_URL` (string Neon non-pooled), `AUTH_SECRET`,
+   `MOCK_GATEWAY_SECRET`, `ADMIN_EMAIL=owner@evogaming.local`,
+   `ADMIN_PASSWORD`, `PAYMENT_MODE=mock`,
+   `NEXT_PUBLIC_SITE_URL=https://evo-gaming.vercel.app`, `NODE_VERSION=22`.
+5. Deploy, lalu cek `/sitemap.xml`, `/admin/login`, `/booking`, `/menu`.
+6. URL asli ada di **Settings → Domains**. Kalau ada suffix, update
+   `NEXT_PUBLIC_SITE_URL` lalu redeploy (nilainya di-inline saat build).
+
+Catatan: ini serverless, bukan proses Node yang jalan terus. Aman untuk demo
+karena advisory lock bersifat transaction-scoped dan hold 15 menit tersimpan di
+database, bukan di memori proses.
+
+## Opsi gratis (butuh kartu verifikasi): Render + Neon
 
 Ini jalur Rp0. Keduanya punya batasan, tapi cukup untuk demo:
 

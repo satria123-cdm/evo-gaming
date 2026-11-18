@@ -12,7 +12,8 @@ dasar) selesai dan teruji end-to-end dengan mode simulasi QRIS
 WhatsApp, dan konfigurasi deploy produksi.
 
 Untuk menaruh demo ini online dengan QRIS simulasi tetap aktif, ikuti
-[`DEPLOY.md`](./DEPLOY.md) (gratis: Render + Neon; atau Railway / VPS + Docker).
+[`DEPLOY.md`](./DEPLOY.md) (gratis tanpa kartu: Vercel + Neon; alternatif:
+Render / Railway / VPS + Docker).
 
 ## Menjalankan
 
